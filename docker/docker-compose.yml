@@ -1,0 +1,170 @@
+version: '3'
+
+services:
+  internship-postgres:
+    container_name: internship-postgres
+    image: postgres:12.0
+    restart: always
+    ports:
+      - '6432:5432'
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES="internship-hareem","internship-woongbeom","internship-jinyeong","internship-sora","internship-junghyun"
+      - POSTGRES_USER=intern
+      - POSTGRES_PASSWORD=intern
+    volumes:
+      - ./docker-postgresql-multiple-databases:/docker-entrypoint-initdb.d
+      - internship-pgdb:/var/lib/postgresql/data
+
+  internship-zookeeper:
+    container_name: internship-zookeeper
+    image: confluentinc/cp-zookeeper:5.2.2
+    hostname: zookeeper
+    ports:
+      - '2182:3181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2182
+    volumes:
+      - internship-zk-data:/var/lib/zookeeper/data
+      - internship-zk-log:/var/lib/zookeeper/log
+
+  internship-kafka:
+    container_name: internship-kafka
+    image: confluentinc/cp-enterprise-kafka:5.2.2
+    hostname: kafka
+    ports:
+      - '8094:8094'
+      - '8095:8095'
+    depends_on:
+      - internship-zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2182
+      KAFKA_LISTENERS: INTERNAL://kafka:8094,EXTERNAL://kafka:8095
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:8094,EXTERNAL://localhost:8095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+    volumes:
+      - internship-kafka-data:/var/lib/kafka/data
+
+  internship-jinyeong:
+    container_name: internship-jinyeong
+    build:
+      context: ../backend/jinyeong
+    restart: always
+    ports:
+      - 4003:4003
+    depends_on:
+      - internship-postgres
+
+  internship-junghyun:
+    container_name: internship-junghyun
+    image: internship-junghyun
+    ports:
+      - '4000:4000'
+    depends_on:
+      - internship-postgres
+    build:
+      context: ../backend/junghyun/koa-books
+
+  internship-woongbeom:
+    container_name: internship-woongbeom
+    image: internship-woongbeom:latest
+    ports:
+      - '4005:4005'
+    build:
+      context: ../backend/woongbeom
+    depends_on:
+      - internship-postgres
+
+  internship-hareem:
+    container_name: internship-hareem
+    image: internship-hareem
+    build:
+      context: ../backend/hareem
+    ports:
+      - '4001:4001'
+    restart: always
+    depends_on:
+      - internship-postgres
+      - internship-zookeeper
+      - internship-kafka
+    environment:
+      PORT: 4001
+      PROJECT_NAME: barogo-library
+      DB_USERNAME: intern
+      DB_PASSWORD: intern
+      DB_NAME: internship-hareem
+      DB_HOST: internship-postgres
+      DB_PORT: 5432
+      DB_TIMEZONE: UTC
+      DB_DIALECT: postgres
+      KAFKA_CLIENT_ID: internship-hareem
+      KAFKA_BROKER: kafka:8094
+      KAFKA_CONSUMER_GROUP_ID: internship-hareem
+      MAILER_SERVICE: gmail
+      MAILER_HOST: smtp.gmail.com
+      MAILER_AUTH_USER: hrsongdev@gmail.com
+      MAILER_AUTH_PASSWORD: zrmmtepnuortnslk
+      MAILER_FROM: '"barogo-library" <hrsong@barogo.com>'
+      JWT_ACCESS_TOKEN_SECRET_KEY: intern_access
+      JWT_ACCESS_TOKEN_EXPIRES_IN: 2h
+      JWT_REFRESH_TOKEN_SECRET_KEY: intern_refresh
+      JWT_REFRESH_TOKEN_EXPIRES_IN: 14d
+      HASH_SALT: 10
+
+  internship-juyoungjung:
+    container_name: juyoungjung-weather-channel-app
+    build:
+      context: ../frontend/juyoungjung/weather-channel
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+
+  internship-sora:
+    container_name: internship-sora
+    image: internship-sora
+    ports:
+      - '4002:4002'
+    depends_on:
+      - internship-postgres
+    build:
+      context: ../backend/sorakang/koa-books
+
+  internship-deokhyeong:
+    container_name: deokhyeong-weather-app
+    build:
+      context: ../frontend/deokhyeong/weather
+      dockerfile: Dockerfile
+    ports:
+      - "8089:8089"
+
+  internship-kimin:
+    container_name: kimin-weather-app
+    build:
+      context: ../frontend/Kimin/weather-channel
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+
+  internship-gihwan:
+    container_name: gihwan-weather-app
+    build:
+      context: ../frontend/gihwan/weather
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
+  internship-jay:
+    container_name: jay-weather-app
+    build:
+      context: ../frontend/jay/weather
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
+
+volumes:
+  internship-pgdb:
+  internship-zk-data:
+  internship-zk-log:
+  internship-kafka-data:

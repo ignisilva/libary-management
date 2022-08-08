@@ -1,0 +1,77 @@
+
+type User {
+  id: UUID
+  email: EmailAddress
+  password: String
+  phone: String
+  name: String
+  warningCount: Int
+  rentalCount: Int
+  createdAt: DateTime
+  deletedAt: DateTime
+  auth: Auth
+}
+
+type Query {
+  getUsers(input: GetUsersInput): GetUsersOutput!
+  getUser(input: GetUserInput!): GetUserOutput!
+  getUserSelf: GetUserOutput!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): CreateUserOutput!
+  updateUser(input: UpdateUserInput!): UpdateUserOutput!
+  deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+}
+
+input GetUsersInput {
+  page: Int!
+  from: String!
+  to: String!
+  filter: Filter!
+  email: Int!
+  warningCount: String!
+}
+
+type GetUsersOutput {
+  users: [User]
+}
+
+input GetUserInput {
+  id: UUID
+}
+
+type GetUserOutput {
+  user: User
+}
+
+input CreateUserInput {
+  email: EmailAddress!
+  password: String!
+  phone: String!
+  name: String!
+  role: ROLE
+}
+
+type CreateUserOutput {
+  user: User
+}
+
+input UpdateUserInput {
+  id: UUID
+  password: String
+  phone: String
+  name: String
+}
+
+type UpdateUserOutput {
+  user: User
+}
+
+input DeleteUserInput {
+  id: UUID!
+}
+
+type DeleteUserOutput {
+  result: String
+}

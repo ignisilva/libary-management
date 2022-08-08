@@ -1,0 +1,79 @@
+type BookInfo {
+  id: ID
+  isbn: String
+  title: String
+  author: String
+  publisher: String
+  publishDate: String
+  description: String
+  books: [Book]
+}
+
+type Book {
+  id: ID
+  isRentaled: Boolean
+  createdAt: DateTime
+  deletedAt: DateTime
+  bookInfo: BookInfo
+}
+
+type Query {
+  getBookInfosWithBooks(input: GetBookInfosWithBooksInput): GetBookInfosWithBooksOutput!
+}
+
+type Mutation {
+  createBook(input: CreateBookInput!): CreateBookOutput!
+  updateBookInfo(input: UpdateBookInfoInput!): UpdateBookInfoOutput!
+  deleteBook(input: DeleteBookInput!): DeleteBookOutput!
+}
+
+input GetBookInfosWithBooksInput {
+  page: Int!
+  from: String!
+  to: String!
+  filter: Filter!
+  bookInfoId: Int!
+  isbn: String!
+  title: String!
+  author: String!
+  publisher: String!
+}
+
+type GetBookInfosWithBooksOutput {
+  bookInfos: [BookInfo]
+}
+
+input CreateBookInput {
+  isbn: String!
+  title: String!
+  author: String!
+  publisher: String!
+  publishDate: String!
+  description: String!
+}
+
+type CreateBookOutput {
+  book: Book
+}
+
+input UpdateBookInfoInput {
+  id: Int!
+  isbn: String
+  title: String
+  author: String
+  publisher: String
+  publishDate: String
+  description: String
+}
+
+type UpdateBookInfoOutput {
+  bookInfo: BookInfo
+}
+
+input DeleteBookInput {
+  bookId: Int!
+}
+
+type DeleteBookOutput {
+  result: String
+}

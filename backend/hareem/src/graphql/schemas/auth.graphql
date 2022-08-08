@@ -1,0 +1,33 @@
+enum ROLE {
+  USER
+  ADMIN
+}
+
+type Auth {
+  role: ROLE
+  updatedAt: DateTime
+}
+
+type Mutation {
+  login(input: LoginInput!): LoginOutput!
+  logout: LogoutOutput
+  refreshAccessToken: RefreshAccessTokenOutput
+}
+
+input LoginInput {
+  email: EmailAddress
+  password: String
+}
+
+type LoginOutput {
+  accessToken: JWT
+}
+
+type LogoutOutput {
+  result: String
+}
+
+type RefreshAccessTokenOutput {
+  accessToken: JWT
+}
+

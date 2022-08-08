@@ -1,0 +1,47 @@
+type Reservation {
+  id: Int
+  createdAt: DateTime
+  doneDate: DateTime
+  user: User
+  bookInfo: BookInfo
+}
+
+type Query {
+  getReservationsByUsers(input: GetReservationsByUsersInput): GetReservationsByUsersOutput!
+}
+
+type Mutation {
+  createReservation(input: CreateReservationInput!): CreateReservationOutput!
+  deleteReservation(input: DeleteReservationInput!): DeleteReservationOutput!
+}
+
+input GetReservationsByUsersInput {
+  page: Int
+  from: String
+  to: String
+  filter: Filter
+  userId: UUID
+  bookInfoId: Int
+}
+
+type GetReservationsByUsersOutput {
+  reservations: [Reservation]
+}
+
+input CreateReservationInput {
+  userId: UUID
+  bookInfoId: Int
+}
+
+type CreateReservationOutput {
+  reservation: Reservation
+}
+
+input DeleteReservationInput {
+  userId: UUID
+  reservationId: Int
+}
+
+type DeleteReservationOutput {
+  result: String
+}
